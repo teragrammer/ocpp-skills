@@ -1,5 +1,5 @@
 ---
-name: ocpp
+name: ocpp-skills
 description: "Build the HTTP/JSON API backend that sits in front of an OCPP central system (CSMS) for EV charging across OCPP-J 1.6, 2.0.1 and 2.1. Use when mapping REST endpoints to OCPP actions such as RemoteStartTransaction, RequestStartTransaction, TransactionEvent, SetDefaultTariff and NotifySettlement; when computing session energy, tariffs, cost, VAT, invoices or refunds; when authorizing drivers or payments; when handling smart charging, reservations, configuration or status; or when debugging OCPP statuses, seqNo gaps, meter values and protocol traps. Trigger on OCPP, OCPP-J, ocpp1.6, ocpp2.0.1, ocpp2.1, CSMS or charge-point backend even when no version is named. Do not use to write charger firmware or a raw OCPP WebSocket server."
 license: MIT
 compatibility: "Agent Skills standard (SKILL.md). Works with Claude Code, OpenCode, and other compatible agents. No runtime dependencies."
