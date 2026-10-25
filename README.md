@@ -31,27 +31,36 @@ production.
 
 ```text
 ocpp-skills/
-├── SKILL.md                     # the only entry point: version router + universal invariants
-├── references/
-│   ├── versions.md              # choose, compare and migrate versions
-│   ├── version-1.6.md           # 1.6 build playbook
-│   ├── version-2.0.1.md         # 2.0.1 build playbook
-│   ├── version-2.1.md           # 2.1 build playbook (tariffs + settlement)
-│   ├── contract-1.6.md          # 1.6 operations, enums, events, CALLERRORs
-│   ├── contract-2.0.1.md        # 2.0.1 operations, enums, events, CALLERRORs
-│   ├── contract-2.1.md          # 2.1 operations, enums, events, message types 5/6
-│   ├── api-design.md            # REST↔OCPP contract, HTTP mapping, idempotency, reconnect
-│   ├── billing.md               # energy maths, rating, invoices, refunds, reconciliation
-│   ├── tariffs.md               # 2.1 TariffType, costDetails, VAT, settlement
-│   └── traps.md                 # cross-version trap catalogue + symptom index
-├── scripts/validate_skill.py    # dependency-free skill validator
-├── evals/                       # trigger and task eval sets for maintainers
-├── install.sh                   # installer for Claude Code and OpenCode
 ├── README.md
-├── CONTRIBUTING.md
-├── CHANGELOG.md
 ├── LICENSE
-└── .github/workflows/validate.yml
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── install.sh                   # installer for Claude Code and OpenCode
+├── .github/workflows/validate.yml
+└── skills/
+    └── ocpp-skills/
+        ├── SKILL.md             # the only entry point: version router + universal invariants
+        ├── references/
+        │   ├── versions.md              # choose, compare and migrate versions
+        │   ├── version-1.6.md           # 1.6 build playbook
+        │   ├── version-2.0.1.md         # 2.0.1 build playbook
+        │   ├── version-2.1.md           # 2.1 build playbook (tariffs + settlement)
+        │   ├── contract-1.6.md          # 1.6 operations, enums, events, CALLERRORs
+        │   ├── contract-2.0.1.md        # 2.0.1 operations, enums, events, CALLERRORs
+        │   ├── contract-2.1.md          # 2.1 operations, enums, events, message types 5/6
+        │   ├── api-design.md            # REST↔OCPP contract, HTTP mapping, idempotency, reconnect
+        │   ├── billing.md               # energy maths, rating, invoices, refunds, reconciliation
+        │   ├── tariffs.md               # 2.1 TariffType, costDetails, VAT, settlement
+        │   └── traps.md                 # cross-version trap catalogue + symptom index
+        ├── scripts/validate_skill.py    # dependency-free skill validator
+        └── evals/                       # trigger and task eval sets for maintainers
+```
+
+The skill lives under `skills/ocpp-skills/`, the standard layout for the
+[`npx skills`](https://github.com/vercel-labs/skills) CLI — install it with:
+
+```bash
+npx skills add <your-github-owner>/ocpp-skills
 ```
 
 Only `SKILL.md` is loaded when the skill triggers. The references load on demand, so the skill costs
@@ -79,16 +88,25 @@ The skill also covers migration between versions and mixed-fleet architecture.
 Pick **one** of the methods below. The skill directory must be named `ocpp-skills` and contain `SKILL.md`
 at its root.
 
+### npx skills (Claude Code, OpenCode, and others)
+
+```bash
+npx skills add teragrammer/ocpp-skills --skill ocpp-skills
+```
+
+The CLI detects the skill under `skills/ocpp-skills/` and installs it into the agents you select.
+
 ### Claude Code — personal (all projects)
 
 ```bash
-git clone https://github.com/teragrammer/ocpp-skills.git ~/.claude/skills/ocpp-skills
+./install.sh --claude
 ```
 
-Or, if you already cloned this repository:
+Or with a manual copy:
 
 ```bash
-./install.sh --claude
+git clone https://github.com/teragrammer/ocpp-skills.git /tmp/ocpp-skills
+cp -R /tmp/ocpp-skills/skills/ocpp-skills ~/.claude/skills/ocpp-skills
 ```
 
 The result is:
@@ -104,7 +122,7 @@ during the current session.
 
 ```bash
 mkdir -p .claude/skills
-cp -R /path/to/ocpp-skills .claude/skills/ocpp-skills
+cp -R /path/to/ocpp-skills/skills/ocpp-skills .claude/skills/ocpp-skills
 ```
 
 Or:
@@ -118,8 +136,8 @@ Commit `.claude/skills/ocpp-skills/` so every contributor gets the same guidance
 ### OpenCode — personal (all projects)
 
 ```bash
-mkdir -p ~/.config/opencode/ocpp-skills
-cp -R /path/to/ocpp-skills ~/.config/opencode/skills/ocpp-skills
+mkdir -p ~/.config/opencode/skills
+cp -R /path/to/ocpp-skills/skills/ocpp-skills ~/.config/opencode/skills/ocpp-skills
 ```
 
 Or:
@@ -136,7 +154,7 @@ directory layout.
 
 ```bash
 mkdir -p .opencode/skills
-cp -R /path/to/ocpp-skills .opencode/skills/ocpp-skills
+cp -R /path/to/ocpp-skills/skills/ocpp-skills .opencode/skills/ocpp-skills
 ```
 
 Or:
@@ -168,7 +186,7 @@ This installs to `~/agent-skills/ocpp-skills`. `--dir` is the parent directory; 
 
 ### Manual install (any agent, including Windows)
 
-1. Copy this directory so the destination contains `SKILL.md` at its root.
+1. Copy `skills/ocpp-skills/` so the destination contains `SKILL.md` at its root.
 2. Place it in your agent's skills directory. Common locations:
    - Claude Code personal: `%USERPROFILE%\.claude\skills\ocpp-skills\`
    - Claude Code project: `.claude\skills\ocpp-skills\`
@@ -178,10 +196,10 @@ This installs to `~/agent-skills/ocpp-skills`. `--dir` is the parent directory; 
 
 ### Verify
 
-From the skill directory:
+From the repository root:
 
 ```bash
-python3 scripts/validate_skill.py
+python3 skills/ocpp-skills/scripts/validate_skill.py
 ```
 
 Expected: `OK` with the skill name, version and file count. The validator checks frontmatter, name
@@ -199,16 +217,16 @@ the description trigger it.
 
 ### Update
 
-If the skill directory is a git clone:
+If you installed with `npx skills`, re-run the add command; it replaces the installed files:
 
 ```bash
-cd ~/.claude/skills/ocpp-skills && git pull
+npx skills add teragrammer/ocpp-skills --skill ocpp-skills
 ```
 
-If you copied it:
+If you copied it, pull the repository and re-run the installer:
 
 ```bash
-./install.sh --claude --force
+git -C /path/to/ocpp-skills pull && ./install.sh --claude --force
 ```
 
 `--force` replaces an existing install. Without it, the installer refuses to overwrite a directory.
@@ -305,7 +323,7 @@ and avoids three divergent copies of the same rule.
 Frontmatter is intentionally minimal and portable:
 
 ```yaml
-name: ocpp
+name: ocpp-skills
 description: ...
 license: MIT
 compatibility: ...
@@ -323,7 +341,7 @@ it.
 The repository ships a dependency-free validator and a GitHub Actions workflow:
 
 ```bash
-python3 scripts/validate_skill.py
+python3 skills/ocpp-skills/scripts/validate_skill.py
 ```
 
 It checks:
@@ -357,16 +375,18 @@ automatically — they are a starting point for maintainers testing a change aga
 To publish this as a single open-source Agent Skill repository:
 
 1. Push this directory as the root of a new repository, for example `github.com/<your-org>/ocpp-skills`.
-2. Keep the directory name `ocpp-skills` and the `SKILL.md` `name: ocpp-skills` field aligned; both Claude Code and
-   OpenCode require the skill name to match its directory.
+2. Keep the skill at `skills/ocpp-skills/` with `name: ocpp-skills` in the `SKILL.md` frontmatter —
+   the name must match its directory, and the `skills/` container is what the
+   [`npx skills`](https://github.com/vercel-labs/skills) CLI and [skills.sh](https://skills.sh) expect.
 3. Set the release version in the frontmatter metadata and the matching entry in `CHANGELOG.md`.
 4. Tag the release (for example `v1.0.0`); the `validate` GitHub Actions workflow runs on every push
    and pull request.
-5. Attach a zip of this directory, excluding `.git/`, to the GitHub release. Consumers extract it
-   into their skills directory and validate with `scripts/validate_skill.py`.
+5. Attach a zip of `skills/ocpp-skills/`, excluding `.git/`, to the GitHub release. Consumers extract it
+   into their skills directory and validate with `skills/ocpp-skills/scripts/validate_skill.py`.
 
 No build step is required. The published artifact is just the directory tree: `SKILL.md` plus
-`references/`, with the install script, validator and evals alongside.
+`references/`, with the validator and evals alongside; repository docs and `install.sh` live at the
+root.
 
 ## Contributing
 

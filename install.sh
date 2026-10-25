@@ -7,15 +7,16 @@
 #   ./install.sh --claude            # personal Claude Code
 #   ./install.sh --opencode          # personal OpenCode
 #   ./install.sh --both              # both personal locations
-#   ./install.sh --project           # ./.claude/skills/ocpp
-#   ./install.sh --project-opencode  # ./.opencode/skills/ocpp
-#   ./install.sh --dir PATH          # install under PATH/ocpp
+#   ./install.sh --project           # ./.claude/skills/ocpp-skills
+#   ./install.sh --project-opencode  # ./.opencode/skills/ocpp-skills
+#   ./install.sh --dir PATH          # install under PATH/ocpp-skills
 #   ./install.sh --force             # replace an existing install
 #
 set -euo pipefail
 
-SKILL_NAME="ocpp"
+SKILL_NAME="ocpp-skills"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SKILL_SRC="$SCRIPT_DIR/skills/$SKILL_NAME"
 
 usage() {
   cat <<'EOF'
@@ -26,14 +27,14 @@ Usage:
   ./install.sh --claude            personal Claude Code
   ./install.sh --opencode          personal OpenCode
   ./install.sh --both              both personal locations
-  ./install.sh --project           ./.claude/skills/ocpp
-  ./install.sh --project-opencode  ./.opencode/skills/ocpp
-  ./install.sh --dir PATH          install under PATH/ocpp
+  ./install.sh --project           ./.claude/skills/ocpp-skills
+  ./install.sh --project-opencode  ./.opencode/skills/ocpp-skills
+  ./install.sh --dir PATH          install under PATH/ocpp-skills
   ./install.sh --force             replace an existing install
   ./install.sh --help              show this help
 
 Default:
-  ~/.claude/skills/ocpp
+  ~/.claude/skills/ocpp-skills
 
 OpenCode also discovers ~/.claude/skills, so the default install serves both tools.
 Use --opencode if you want the native ~/.config/opencode/skills path.
@@ -76,7 +77,7 @@ while (($# > 0)); do
   shift
 done
 
-[[ -f "$SCRIPT_DIR/SKILL.md" ]] || fail "SKILL.md not found next to this script"
+[[ -f "$SKILL_SRC/SKILL.md" ]] || fail "SKILL.md not found at $SKILL_SRC"
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 
@@ -128,9 +129,9 @@ for target in "${targets[@]}"; do
   fi
   mkdir -p -- "$target"
 
-  cp -- "$SCRIPT_DIR/SKILL.md" "$target/SKILL.md"
-  cp -R -- "$SCRIPT_DIR/references" "$target/references"
-  cp -R -- "$SCRIPT_DIR/scripts" "$target/scripts"
+  cp -- "$SKILL_SRC/SKILL.md" "$target/SKILL.md"
+  cp -R -- "$SKILL_SRC/references" "$target/references"
+  cp -R -- "$SKILL_SRC/scripts" "$target/scripts"
 
   for extra in LICENSE README.md CHANGELOG.md; do
     if [[ -f "$SCRIPT_DIR/$extra" ]]; then
@@ -145,5 +146,5 @@ printf '\n'
 printf 'Verify with:\n'
 printf '  python3 "%s/scripts/validate_skill.py"\n' "${targets[0]}"
 printf '\n'
-printf 'Invoke in Claude Code with /ocpp, or let the description trigger it.\n'
-printf 'Invoke in OpenCode by mentioning @ocpp or letting the description trigger it.\n'
+printf 'Invoke in Claude Code with /ocpp-skills, or let the description trigger it.\n'
+printf 'Invoke in OpenCode by mentioning @ocpp-skills or letting the description trigger it.\n'

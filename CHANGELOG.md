@@ -9,12 +9,17 @@ All notable changes to this skill are documented here. The format follows
 ### Fixed
 
 - The validator no longer skips every file when the skill is installed under a hidden directory
-  such as `~/.claude/skills/ocpp` or `~/.config/opencode/skills/ocpp`.
-- `install.sh --dir PATH` now treats `PATH` as a parent directory and installs to `PATH/ocpp`, keeping
+  such as `~/.claude/skills/ocpp-skills` or `~/.config/opencode/skills/ocpp-skills`.
+- `install.sh --dir PATH` now treats `PATH` as a parent directory and installs to `PATH/ocpp-skills`, keeping
   the skill name aligned with its directory.
 
 ### Changed
 
+- Renamed the application from `ocpp` to `ocpp-skills`; the frontmatter `name`, installer target and
+  docs now all use `ocpp-skills`.
+- Moved the skill into `skills/ocpp-skills/` so the repository is discoverable by the
+  [`npx skills`](https://github.com/vercel-labs/skills) CLI (`npx skills add <owner>/ocpp-skills`).
+  Repository docs, installer and CI workflow stay at the root.
 - Corrected the 2.x unit-normalisation example: for `value = 4.9`, unit `kWh` and
   `multiplier = 0`, the reading is **4900 Wh**, not 4.9 Wh; the old "naive" column entry was wrong.
 
