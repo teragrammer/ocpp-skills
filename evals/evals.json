@@ -1,0 +1,89 @@
+{
+  "skill_name": "ocpp",
+  "evals": [
+    {
+      "id": 1,
+      "name": "ocpp-1.6-session-and-billing",
+      "prompt": "We are building the REST API in front of an ocpp1.6 CSMS. Add POST /sessions and POST /sessions/{id}/stop, and explain exactly how we compute the bill. The charger sends StartTransaction.meterStart=12000 and StopTransaction.meterStop=18750.",
+      "expected_output": "Maps POST /sessions to RemoteStartTransaction and stop to RemoteStopTransaction, returns 202 for Accepted, binds the CSMS-allocated integer transactionId on StartTransaction.conf, and bills (18750 - 12000) / 1000 = 6.75 kWh using meterStop - meterStart. Should warn that 1.6 has no price fields and that MeterValues is not the invoice source.",
+      "assertions": [
+        "Uses RemoteStartTransaction and RemoteStopTransaction",
+        "Returns 202 rather than 200 for Accepted",
+        "Binds transactionId at StartTransaction.conf",
+        "Computes 6.75 kWh from meterStop - meterStart",
+        "States that 1.6 has no native price or tariff"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "ocpp-2.0.1-seqno-gap",
+      "prompt": "An ocpp2.0.1 charger sends TransactionEvent(Ended) with offline=true. We have Started at seqNo 10 and Ended at seqNo 18, but we are missing 13, 14 and 15. The last meterValue is present. Can we invoice, and what should the API do?",
+      "expected_output": "Refuses to invoice immediately. Explains that seqNo is per-EVSE and that a gap means calling GetTransactionStatus. If messagesInQueue=true, defer and poll; if false, close as estimated=true, record missing_seq_count, and alert ops. The last meterValue can be used only for an estimated close.",
+      "assertions": [
+        "Refuses to invoice on a seqNo gap",
+        "Calls GetTransactionStatus before closing",
+        "Defers when messagesInQueue is true",
+        "Closes as estimated with gaps recorded when the queue is empty",
+        "Notes that seqNo is per-EVSE"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "ocpp-2.1-tariff-publication",
+      "prompt": "Design the ocpp2.1 tariff for a public AC charger: 0.44 EUR/kWh off-peak, 0.69 EUR/kWh from 16:00 to 22:00, a 0.50 EUR session fee, and 21% VAT. Include the JSON and the checks we must run before invoicing the station's costDetails.",
+      "expected_output": "Produces a TariffType with a peak entry first and an unconditional 0.44 fallback last, taxRates with tax: 21.0 (percentage, stack 0), currency EUR, and an immutable tariffId. Explains that re-sending the same id with new content returns DuplicateTariffId, that prices exclude tax, and that costDetails must be verified for failureToCalculate, chargingPeriods, tariffId drift and recomputation before invoicing.",
+      "assertions": [
+        "Includes an unconditional fallback price entry last",
+        "Uses tax: 21.0 as a percentage, not 0.21",
+        "Treats tariffId as immutable per content",
+        "Explains costDetails verification before invoicing",
+        "Includes the 0.50 EUR fixed fee"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "mixed-fleet-architecture",
+      "prompt": "We have a mixed fleet of ocpp1.6 and ocpp2.1 chargers. Product wants one public API for start, stop, tariffs and invoices. How should we structure the backend so version differences do not leak everywhere?",
+      "expected_output": "Proposes a stable domain layer, a per-version adapter, and a CSMS transport client. Explains transactionId ownership differences, capability flags per station, 501 for 2.1-only features on 1.6, and a shared canonical session model with nullable version-specific fields. Warns against sharing session table assumptions or backfilling seqNo.",
+      "assertions": [
+        "Separates domain, version adapter and CSMS client",
+        "Addresses transactionId ownership differences",
+        "Gates 2.1-only features with per-station capability flags",
+        "Returns 501 for unsupported version features",
+        "Keeps one public API stable across versions"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "offline-stop-command",
+      "prompt": "Our ocpp2.0.1 charger is offline but a driver pressed stop in the app. Should we queue the RequestStopTransaction and send it when the charger reconnects?",
+      "expected_output": "Says no. RequestStopTransaction is a live-socket operation and must not be queued; a queued stop can hit a recycled transactionId. Returns 409/503 with chargerOffline and lastSeen, leaves the session in STOP_REQUESTED or an explicit offline state, and reconciles with GetTransactionStatus on reconnect. Safe-to-queue operations are configuration/profile writes, not stops.",
+      "assertions": [
+        "Refuses to queue RequestStopTransaction",
+        "Returns 409 or 503 with chargerOffline and lastSeen",
+        "Explains the recycled transactionId risk",
+        "Reconciles with GetTransactionStatus on reconnect",
+        "Distinguishes safe-to-queue configuration operations"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "vat-validation-direction",
+      "prompt": "A driver enters a company VAT number at an ocpp2.1 station. Should our public API expose POST /vat/validate for the station to call, and what must the response contain?",
+      "expected_output": "Explains that VatNumberValidation is CSMS-to-station, so the station initiates it and the CSMS calls your backend as a webhook; it is not a public driver endpoint. The reply must echo vatNumber and evseId, use GenericStatusEnumType Accepted/Rejected, and put the reason in statusInfo.reasonCode. Omitting the echo breaks reverse charge.",
+      "assertions": [
+        "Identifies VatNumberValidation as CSMS-to-station",
+        "Models it as a CSMS webhook/callback, not a public endpoint",
+        "Echoes vatNumber and evseId",
+        "Uses Accepted/Rejected only, with reasonCode for details",
+        "Explains the reverse-charge consequence"
+      ],
+      "files": []
+    }
+  ]
+}

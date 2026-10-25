@@ -1,0 +1,74 @@
+[
+  {
+    "query": "we're building the backend for our ev chargers and the csms speaks ocpp1.6 - i need endpoints to start and stop sessions and bill from meterStart/meterStop",
+    "should_trigger": true
+  },
+  {
+    "query": "map our express api onto ocpp2.0.1 RequestStartTransaction, and make sure we don't invoice before seqNo is complete",
+    "should_trigger": true
+  },
+  {
+    "query": "how do i publish a peak/off-peak tariff with vat on ocpp 2.1 and verify costDetails before creating the invoice",
+    "should_trigger": true
+  },
+  {
+    "query": "our charging invoices are 1000x too high, the station sends 4900 with unit Wh and multiplier 0",
+    "should_trigger": true
+  },
+  {
+    "query": "design the event contract between our csms and our billing service for TransactionEvent started/updated/ended",
+    "should_trigger": true
+  },
+  {
+    "query": "we have 1.6 and 2.1 chargers in one fleet and need one public api without leaking version concepts into every handler",
+    "should_trigger": true
+  },
+  {
+    "query": "driver authorization says accepted on Authorize but StartTransaction.conf.idTagInfo is Blocked - what do we do with the payment?",
+    "should_trigger": true
+  },
+  {
+    "query": "NotifySettlement never arrives and PaymentCtrlr.SettlementByCSMS is true, how should we reconcile the money?",
+    "should_trigger": true
+  },
+  {
+    "query": "we need a rest api for charging sessions but the hardware team already owns the ocpp stack",
+    "should_trigger": true
+  },
+  {
+    "query": "write firmware for an esp32 charge controller using modbus",
+    "should_trigger": false
+  },
+  {
+    "query": "build a websocket server that speaks ocpp from scratch, with no http api or billing layer",
+    "should_trigger": false
+  },
+  {
+    "query": "create a react dashboard for monitoring solar panel output",
+    "should_trigger": false
+  },
+  {
+    "query": "design a stripe checkout flow for a saas subscription",
+    "should_trigger": false
+  },
+  {
+    "query": "parse a pcap of a websocket handshake and show me the frames",
+    "should_trigger": false
+  },
+  {
+    "query": "write a python script to read a csv of electricity meter readings and plot them",
+    "should_trigger": false
+  },
+  {
+    "query": "what is the difference between level 2 and level 3 ev charging?",
+    "should_trigger": false
+  },
+  {
+    "query": "set up a home assistant automation for my tesla",
+    "should_trigger": false
+  },
+  {
+    "query": "our ocpp chargers are fine but the postgres database for the billing service needs an index on created_at",
+    "should_trigger": false
+  }
+]

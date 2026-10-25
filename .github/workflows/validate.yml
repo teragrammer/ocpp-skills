@@ -1,0 +1,37 @@
+name: validate
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate skill package
+        run: python3 scripts/validate_skill.py
+
+      - name: Check installer syntax
+        run: bash -n install.sh
+
+      - name: Shellcheck installer
+        run: shellcheck install.sh
+
+      - name: Test installer under a hidden path
+        run: |
+          target="$RUNNER_TEMP/.skill-install"
+          ./install.sh --dir "$target" --force
+          python3 "$target/ocpp/scripts/validate_skill.py"
