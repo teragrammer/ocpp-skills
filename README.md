@@ -30,7 +30,7 @@ production.
 ## What's inside
 
 ```text
-ocpp/
+ocpp-skills/
 ├── SKILL.md                     # the only entry point: version router + universal invariants
 ├── references/
 │   ├── versions.md              # choose, compare and migrate versions
@@ -76,13 +76,13 @@ The skill also covers migration between versions and mixed-fleet architecture.
 
 ## Installation
 
-Pick **one** of the methods below. The skill directory must be named `ocpp` and contain `SKILL.md`
+Pick **one** of the methods below. The skill directory must be named `ocpp-skills` and contain `SKILL.md`
 at its root.
 
 ### Claude Code — personal (all projects)
 
 ```bash
-git clone https://github.com/<your-org>/ocpp.git ~/.claude/skills/ocpp
+git clone https://github.com/teragrammer/ocpp-skills.git ~/.claude/skills/ocpp-skills
 ```
 
 Or, if you already cloned this repository:
@@ -94,7 +94,7 @@ Or, if you already cloned this repository:
 The result is:
 
 ```text
-~/.claude/skills/ocpp/SKILL.md
+~/.claude/skills/ocpp-skills/SKILL.md
 ```
 
 Claude Code detects skill changes live; run `/reload-skills` if you created the skills directory
@@ -104,7 +104,7 @@ during the current session.
 
 ```bash
 mkdir -p .claude/skills
-cp -R /path/to/ocpp .claude/skills/ocpp
+cp -R /path/to/ocpp-skills .claude/skills/ocpp-skills
 ```
 
 Or:
@@ -113,13 +113,13 @@ Or:
 ./install.sh --project
 ```
 
-Commit `.claude/skills/ocpp/` so every contributor gets the same guidance.
+Commit `.claude/skills/ocpp-skills/` so every contributor gets the same guidance.
 
 ### OpenCode — personal (all projects)
 
 ```bash
-mkdir -p ~/.config/opencode/skills
-cp -R /path/to/ocpp ~/.config/opencode/skills/ocpp
+mkdir -p ~/.config/opencode/ocpp-skills
+cp -R /path/to/ocpp-skills ~/.config/opencode/skills/ocpp-skills
 ```
 
 Or:
@@ -136,7 +136,7 @@ directory layout.
 
 ```bash
 mkdir -p .opencode/skills
-cp -R /path/to/ocpp .opencode/skills/ocpp
+cp -R /path/to/ocpp-skills .opencode/skills/ocpp-skills
 ```
 
 Or:
@@ -145,7 +145,7 @@ Or:
 ./install.sh --project-opencode
 ```
 
-OpenCode also discovers `.claude/skills/`, so a single project install under `.claude/skills/ocpp`
+OpenCode also discovers `.claude/skills/`, so a single project install under `.claude/skills/ocpp-skills`
 serves both tools.
 
 ### Install for both tools
@@ -154,7 +154,7 @@ serves both tools.
 ./install.sh --both
 ```
 
-This copies the skill to `~/.claude/skills/ocpp` and `~/.config/opencode/skills/ocpp`. The two
+This copies the skill to `~/.claude/skills/ocpp-skills` and `~/.config/opencode/skills/ocpp-skills`. The two
 copies are independent; update both when you pull a new version.
 
 ### Custom location
@@ -163,17 +163,17 @@ copies are independent; update both when you pull a new version.
 ./install.sh --dir ~/agent-skills
 ```
 
-This installs to `~/agent-skills/ocpp`. `--dir` is the parent directory; the installer keeps the
-`ocpp` directory name so the skill name and its directory stay aligned.
+This installs to `~/agent-skills/ocpp-skills`. `--dir` is the parent directory; the installer keeps the
+`ocpp-skills` directory name so the skill name and its directory stay aligned.
 
 ### Manual install (any agent, including Windows)
 
 1. Copy this directory so the destination contains `SKILL.md` at its root.
 2. Place it in your agent's skills directory. Common locations:
-   - Claude Code personal: `%USERPROFILE%\.claude\skills\ocpp\`
-   - Claude Code project: `.claude\skills\ocpp\`
-   - OpenCode personal: `%USERPROFILE%\.config\opencode\skills\ocpp\`
-   - OpenCode project: `.opencode\skills\ocpp\`
+   - Claude Code personal: `%USERPROFILE%\.claude\skills\ocpp-skills\`
+   - Claude Code project: `.claude\skills\ocpp-skills\`
+   - OpenCode personal: `%USERPROFILE%\.config\opencode\skills\ocpp-skills\`
+   - OpenCode project: `.opencode\skills\ocpp-skills\`
 3. Restart or reload the agent if it does not pick up the new skill automatically.
 
 ### Verify
@@ -194,7 +194,7 @@ Then ask your agent something that should trigger it:
 I need to add a POST /sessions endpoint in front of our ocpp1.6 CSMS.
 ```
 
-In Claude Code you can also invoke it explicitly with `/ocpp`. In OpenCode, mention `@ocpp` or let
+In Claude Code you can also invoke it explicitly with `/ocpp-skills`. In OpenCode, mention `@ocpp-skills` or let
 the description trigger it.
 
 ### Update
@@ -202,7 +202,7 @@ the description trigger it.
 If the skill directory is a git clone:
 
 ```bash
-cd ~/.claude/skills/ocpp && git pull
+cd ~/.claude/skills/ocpp-skills && git pull
 ```
 
 If you copied it:
@@ -216,8 +216,8 @@ If you copied it:
 ### Uninstall
 
 ```bash
-rm -rf ~/.claude/skills/ocpp
-rm -rf ~/.config/opencode/skills/ocpp
+rm -rf ~/.claude/skills/ocpp-skills
+rm -rf ~/.config/opencode/skills/ocpp-skills
 ```
 
 Remove only the paths you installed.
@@ -296,8 +296,8 @@ and avoids three divergent copies of the same rule.
 
 | Tool | Status | Notes |
 |---|---|---|
-| Claude Code | Supported | Personal, project, plugin, or `--add-dir` skills directory. `/ocpp` invocation. |
-| OpenCode V2 | Supported | Native `.opencode/skills/ocpp` or compatibility `.claude/skills/ocpp`. |
+| Claude Code | Supported | Personal, project, plugin, or `--add-dir` skills directory. `/ocpp-skills` invocation. |
+| OpenCode V2 | Supported | Native `.opencode/skills/ocpp-skills` or compatibility `.claude/skills/ocpp-skills`. |
 | Claude.ai / Cowork | Supported | Upload or package the skill directory as a skill archive. |
 | Other Agent Skills tools | Supported | Standard `SKILL.md` + `references/` layout, no tool-specific runtime. |
 | OCPP 1.6 / 2.0.1 / 2.1 | Supported | See the version matrix. |
@@ -356,8 +356,8 @@ automatically — they are a starting point for maintainers testing a change aga
 
 To publish this as a single open-source Agent Skill repository:
 
-1. Push this directory as the root of a new repository, for example `github.com/<your-org>/ocpp`.
-2. Keep the directory name `ocpp` and the `SKILL.md` `name: ocpp` field aligned; both Claude Code and
+1. Push this directory as the root of a new repository, for example `github.com/<your-org>/ocpp-skills`.
+2. Keep the directory name `ocpp-skills` and the `SKILL.md` `name: ocpp-skills` field aligned; both Claude Code and
    OpenCode require the skill name to match its directory.
 3. Set the release version in the frontmatter metadata and the matching entry in `CHANGELOG.md`.
 4. Tag the release (for example `v1.0.0`); the `validate` GitHub Actions workflow runs on every push
