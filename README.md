@@ -36,24 +36,24 @@ ocpp-skills/
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── install.sh                   # installer for Claude Code and OpenCode
+├── scripts/validate_skill.py    # dependency-free skill validator (repo tooling)
+├── evals/                       # trigger and task eval sets for maintainers
 ├── .github/workflows/validate.yml
 └── skills/
     └── ocpp-skills/
         ├── SKILL.md             # the only entry point: version router + universal invariants
-        ├── references/
-        │   ├── versions.md              # choose, compare and migrate versions
-        │   ├── version-1.6.md           # 1.6 build playbook
-        │   ├── version-2.0.1.md         # 2.0.1 build playbook
-        │   ├── version-2.1.md           # 2.1 build playbook (tariffs + settlement)
-        │   ├── contract-1.6.md          # 1.6 operations, enums, events, CALLERRORs
-        │   ├── contract-2.0.1.md        # 2.0.1 operations, enums, events, CALLERRORs
-        │   ├── contract-2.1.md          # 2.1 operations, enums, events, message types 5/6
-        │   ├── api-design.md            # REST↔OCPP contract, HTTP mapping, idempotency, reconnect
-        │   ├── billing.md               # energy maths, rating, invoices, refunds, reconciliation
-        │   ├── tariffs.md               # 2.1 TariffType, costDetails, VAT, settlement
-        │   └── traps.md                 # cross-version trap catalogue + symptom index
-        ├── scripts/validate_skill.py    # dependency-free skill validator
-        └── evals/                       # trigger and task eval sets for maintainers
+        └── references/
+            ├── versions.md              # choose, compare and migrate versions
+            ├── version-1.6.md           # 1.6 build playbook
+            ├── version-2.0.1.md         # 2.0.1 build playbook
+            ├── version-2.1.md           # 2.1 build playbook (tariffs + settlement)
+            ├── contract-1.6.md          # 1.6 operations, enums, events, CALLERRORs
+            ├── contract-2.0.1.md        # 2.0.1 operations, enums, events, CALLERRORs
+            ├── contract-2.1.md          # 2.1 operations, enums, events, message types 5/6
+            ├── api-design.md            # REST↔OCPP contract, HTTP mapping, idempotency, reconnect
+            ├── billing.md               # energy maths, rating, invoices, refunds, reconciliation
+            ├── tariffs.md               # 2.1 TariffType, costDetails, VAT, settlement
+            └── traps.md                 # cross-version trap catalogue + symptom index
 ```
 
 The skill lives under `skills/ocpp-skills/`, the standard layout for the
@@ -199,7 +199,13 @@ This installs to `~/agent-skills/ocpp-skills`. `--dir` is the parent directory; 
 From the repository root:
 
 ```bash
-python3 skills/ocpp-skills/scripts/validate_skill.py
+python3 scripts/validate_skill.py
+```
+
+To validate an installed copy, pass its directory:
+
+```bash
+python3 scripts/validate_skill.py ~/.claude/skills/ocpp-skills
 ```
 
 Expected: `OK` with the skill name, version and file count. The validator checks frontmatter, name
@@ -341,7 +347,7 @@ it.
 The repository ships a dependency-free validator and a GitHub Actions workflow:
 
 ```bash
-python3 skills/ocpp-skills/scripts/validate_skill.py
+python3 scripts/validate_skill.py
 ```
 
 It checks:
@@ -382,11 +388,11 @@ To publish this as a single open-source Agent Skill repository:
 4. Tag the release (for example `v1.0.0`); the `validate` GitHub Actions workflow runs on every push
    and pull request.
 5. Attach a zip of `skills/ocpp-skills/`, excluding `.git/`, to the GitHub release. Consumers extract it
-   into their skills directory and validate with `skills/ocpp-skills/scripts/validate_skill.py`.
+   into their skills directory and validate it with `python3 scripts/validate_skill.py <extracted-dir>`
+   from a clone of this repository.
 
-No build step is required. The published artifact is just the directory tree: `SKILL.md` plus
-`references/`, with the validator and evals alongside; repository docs and `install.sh` live at the
-root.
+No build step is required. The published skill is just `SKILL.md` plus `references/`; the
+validator, evals, installer, docs and CI workflow are repository-level tooling at the root.
 
 ## Contributing
 

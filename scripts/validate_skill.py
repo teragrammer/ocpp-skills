@@ -3,7 +3,12 @@
 
 Dependency-free: uses only the Python standard library. Run from anywhere:
 
-    python3 scripts/validate_skill.py
+    python3 scripts/validate_skill.py [package-dir]
+
+The package directory defaults to ``skills/ocpp-skills`` next to this repository
+root. Pass an explicit path to validate an installed copy, e.g.:
+
+    python3 scripts/validate_skill.py ~/.claude/skills/ocpp-skills
 
 Exit codes:
     0  no errors (warnings may be present)
@@ -18,7 +23,8 @@ import sys
 from pathlib import Path
 from urllib.parse import unquote
 
-ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
+ROOT = REPO_ROOT / "skills" / "ocpp-skills"
 SKILL_MD = ROOT / "SKILL.md"
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(\s*([^)\s]+)(?:\s+['\"][^'\"]*['\"])?\s*\)")
@@ -37,10 +43,12 @@ def warn(message: str) -> None:
 
 
 def rel(path: Path) -> str:
-    try:
-        return str(path.relative_to(ROOT))
-    except ValueError:
-        return str(path)
+    for base in (ROOT, REPO_ROOT):
+        try:
+            return str(path.relative_to(base))
+        except ValueError:
+            continue
+    return str(path)
 
 
 def read_text(path: Path) -> str | None:
@@ -55,11 +63,17 @@ def read_text(path: Path) -> str | None:
 
 
 def is_ignored(path: Path) -> bool:
-    # Only inspect the path relative to the package root. Absolute install paths
-    # legitimately contain hidden directories such as ~/.claude or ~/.config.
-    try:
-        parts = path.resolve().relative_to(ROOT.resolve()).parts
-    except ValueError:
+    # Only inspect the path relative to the package or repository root. Absolute
+    # install paths legitimately contain hidden directories such as ~/.claude.
+    resolved = path.resolve()
+    parts: tuple[str, ...]
+    for base in (ROOT, REPO_ROOT):
+        try:
+            parts = resolved.relative_to(base.resolve()).parts
+            break
+        except ValueError:
+            continue
+    else:
         parts = path.parts
     return any(
         part in IGNORED_DIRS or (part.startswith(".") and part != ".github")
@@ -318,22 +332,40 @@ def check_long_files() -> None:
 
 def check_json() -> int:
     count = 0
-    for path in sorted(ROOT.rglob("*.json")):
-        if is_ignored(path):
-            continue
-        text = read_text(path)
-        if text is None:
-            continue
-        try:
-            json.loads(text)
-        except json.JSONDecodeError as exc:
-            err(f"{rel(path)}: invalid JSON ({exc})")
-        else:
-            count += 1
+    # The eval sets live at the repository root (maintainer tooling), outside the
+    # skill package, so validate both locations when they exist.
+    locations = [ROOT]
+    repo_evals = REPO_ROOT / "evals"
+    if repo_evals.is_dir():
+        locations.append(repo_evals)
+    seen: set[Path] = set()
+    for location in locations:
+        for path in sorted(location.rglob("*.json")):
+            if path in seen or is_ignored(path):
+                continue
+            seen.add(path)
+            text = read_text(path)
+            if text is None:
+                continue
+            try:
+                json.loads(text)
+            except json.JSONDecodeError as exc:
+                err(f"{rel(path)}: invalid JSON ({exc})")
+            else:
+                count += 1
     return count
 
 
 def main() -> int:
+    global ROOT, SKILL_MD
+
+    if len(sys.argv) > 2:
+        print(f"usage: {Path(sys.argv[0]).name} [package-dir]", file=sys.stderr)
+        return 1
+    if len(sys.argv) == 2:
+        ROOT = Path(sys.argv[1]).expanduser().resolve()
+        SKILL_MD = ROOT / "SKILL.md"
+
     print("OCPP skill validation")
     print(f"  package: {ROOT}")
     print()

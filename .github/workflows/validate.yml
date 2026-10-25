@@ -22,7 +22,7 @@ jobs:
           python-version: "3.11"
 
       - name: Validate skill package
-        run: python3 skills/ocpp-skills/scripts/validate_skill.py
+        run: python3 scripts/validate_skill.py
 
       - name: Check installer syntax
         run: bash -n install.sh
@@ -34,4 +34,5 @@ jobs:
         run: |
           target="$RUNNER_TEMP/.skill-install"
           ./install.sh --dir "$target" --force
-          python3 "$target/ocpp-skills/scripts/validate_skill.py"
+          test -f "$target/ocpp-skills/SKILL.md"
+          python3 scripts/validate_skill.py "$target/ocpp-skills"

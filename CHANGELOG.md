@@ -20,6 +20,10 @@ All notable changes to this skill are documented here. The format follows
 - Moved the skill into `skills/ocpp-skills/` so the repository is discoverable by the
   [`npx skills`](https://github.com/vercel-labs/skills) CLI (`npx skills add <owner>/ocpp-skills`).
   Repository docs, installer and CI workflow stay at the root.
+- Moved the maintainer tooling (`scripts/validate_skill.py`, `evals/`) out of the skill directory to
+  the repository root, so installing the skill ships only `SKILL.md` and `references/`. The validator
+  now takes an optional package directory argument (`python3 scripts/validate_skill.py <dir>`) to
+  validate installed copies.
 - Corrected the 2.x unit-normalisation example: for `value = 4.9`, unit `kWh` and
   `multiplier = 0`, the reading is **4900 Wh**, not 4.9 Wh; the old "naive" column entry was wrong.
 

@@ -23,5 +23,5 @@ build/
 *.tmp
 
 # Local skill installs (if someone develops inside a project skills dir)
-.claude/skills/ocpp/
-.opencode/skills/ocpp/
+.claude/skills/ocpp-skills/
+.opencode/skills/ocpp-skills/

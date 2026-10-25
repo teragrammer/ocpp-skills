@@ -131,7 +131,6 @@ for target in "${targets[@]}"; do
 
   cp -- "$SKILL_SRC/SKILL.md" "$target/SKILL.md"
   cp -R -- "$SKILL_SRC/references" "$target/references"
-  cp -R -- "$SKILL_SRC/scripts" "$target/scripts"
 
   for extra in LICENSE README.md CHANGELOG.md; do
     if [[ -f "$SCRIPT_DIR/$extra" ]]; then
@@ -144,7 +143,7 @@ done
 
 printf '\n'
 printf 'Verify with:\n'
-printf '  python3 "%s/scripts/validate_skill.py"\n' "${targets[0]}"
+printf '  python3 "%s/scripts/validate_skill.py" "%s"\n' "$SCRIPT_DIR" "${targets[0]}"
 printf '\n'
 printf 'Invoke in Claude Code with /ocpp-skills, or let the description trigger it.\n'
 printf 'Invoke in OpenCode by mentioning @ocpp-skills or letting the description trigger it.\n'

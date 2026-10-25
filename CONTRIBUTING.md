@@ -19,24 +19,25 @@ real integrator avoid a real failure.
 
 ```text
 README.md, CHANGELOG.md, CONTRIBUTING.md, LICENSE  # repository docs (root)
-install.sh                  # installer for Claude Code and OpenCode
+install.sh                    # installer for Claude Code and OpenCode
+scripts/validate_skill.py     # dependency-free validator (repo tooling)
+evals/                        # trigger and task eval sets (repo tooling)
 .github/workflows/validate.yml # CI validation
 skills/ocpp-skills/
-  SKILL.md                  # the only skill entry point
-  references/versions.md    # version selection, comparison, migration
-  references/version-*.md   # build playbooks
-  references/contract-*.md  # wire-level operations, enums, events
-  references/billing.md     # energy → money, shared
-  references/tariffs.md     # 2.1 tariff/cost/settlement
-  references/api-design.md  # REST surface and integration patterns
-  references/traps.md       # cross-version trap catalogue
-  scripts/validate_skill.py # dependency-free validator
-  evals/                    # trigger and task eval sets
+  SKILL.md                    # the only skill entry point
+  references/versions.md      # version selection, comparison, migration
+  references/version-*.md     # build playbooks
+  references/contract-*.md    # wire-level operations, enums, events
+  references/billing.md       # energy → money, shared
+  references/tariffs.md       # 2.1 tariff/cost/settlement
+  references/api-design.md    # REST surface and integration patterns
+  references/traps.md         # cross-version trap catalogue
 ```
 
 The skill lives under `skills/ocpp-skills/` so it is discoverable by the
-[`npx skills`](https://github.com/vercel-labs/skills) CLI. Repository docs, installer and CI stay at
-the root. All paths below are relative to the repository root.
+[`npx skills`](https://github.com/vercel-labs/skills) CLI — users installing it get only `SKILL.md`
+and `references/`. Maintainer tooling (`scripts/`, `evals/`, installer, CI) stays at the repository
+root. All paths below are relative to the repository root.
 
 `SKILL.md` must stay a **router plus universal rules**. Version specifics belong in a playbook or
 contract file. If `SKILL.md` grows past 500 lines, move detail into a reference and link it.
@@ -48,7 +49,7 @@ contract file. If `SKILL.md` grows past 500 lines, move detail into a reference 
 3. Add its deltas to the comparison matrix and the task router.
 4. Update `README.md` (supported versions, structure, compatibility).
 5. Add a trigger eval and at least one task eval in `evals/`.
-6. Run `python3 skills/ocpp-skills/scripts/validate_skill.py`.
+6. Run `python3 scripts/validate_skill.py`.
 
 Do not create a second `SKILL.md`. One installable skill is the point of this project.
 
@@ -84,7 +85,7 @@ metadata:
 ## Validation
 
 ```bash
-python3 skills/ocpp-skills/scripts/validate_skill.py
+python3 scripts/validate_skill.py
 ```
 
 The validator checks:
@@ -115,7 +116,7 @@ task eval that exercises the new rule.
 - [ ] The failure mode is explained, not just the rule.
 - [ ] `SKILL.md` is still a router, not a dump.
 - [ ] Local links resolve and new references are linked from `SKILL.md`.
-- [ ] `python3 skills/ocpp-skills/scripts/validate_skill.py` passes.
+- [ ] `python3 scripts/validate_skill.py` passes.
 - [ ] `CHANGELOG.md` has an entry under `Unreleased`.
 - [ ] No secrets, customer data or unredacted traces.
 
